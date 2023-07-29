@@ -1,8 +1,8 @@
 <?php
 
-namespace CleaniqueCoders\Nadi\Metric;
+namespace Nadi\Metric;
 
-use CleaniqueCoders\Nadi\Support\Arr;
+use Nadi\Support\Arr;
 use hisorange\BrowserDetect\Parser;
 use Illuminate\Support\Str;
 

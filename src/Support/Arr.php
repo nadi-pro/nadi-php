@@ -1,6 +1,6 @@
 <?php
 
-namespace CleaniqueCoders\Nadi\Support;
+namespace Nadi\Support;
 
 class Arr extends \Illuminate\Support\Arr
 {

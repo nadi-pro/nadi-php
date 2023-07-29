@@ -1,6 +1,6 @@
 <?php
 
-namespace CleaniqueCoders\Nadi\Transporter;
+namespace Nadi\Transporter;
 
 interface Contract
 {

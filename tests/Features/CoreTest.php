@@ -1,11 +1,11 @@
 <?php
 
-namespace CleaniqueCoders\Nadi\Tests\Features;
+namespace Nadi\Tests\Features;
 
-use CleaniqueCoders\Nadi\Exceptions\TransporterException;
-use CleaniqueCoders\Nadi\Tests\TestCase;
-use CleaniqueCoders\Nadi\Transporter\Http;
-use CleaniqueCoders\Nadi\Transporter\Log;
+use Nadi\Exceptions\TransporterException;
+use Nadi\Tests\TestCase;
+use Nadi\Transporter\Http;
+use Nadi\Transporter\Log;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;

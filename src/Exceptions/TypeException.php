@@ -1,6 +1,6 @@
 <?php
 
-namespace CleaniqueCoders\Nadi\Exceptions;
+namespace Nadi\Exceptions;
 
 class TypeException extends \Exception
 {

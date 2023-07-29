@@ -1,9 +1,9 @@
 <?php
 
-namespace CleaniqueCoders\Nadi\Transporter;
+namespace Nadi\Transporter;
 
-use CleaniqueCoders\Nadi\Concerns\InteractsWithTransporterId;
-use CleaniqueCoders\Nadi\Exceptions\TransporterException;
+use Nadi\Concerns\InteractsWithTransporterId;
+use Nadi\Exceptions\TransporterException;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 

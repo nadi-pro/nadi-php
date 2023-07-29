@@ -1,15 +1,15 @@
 {
-    "name": "cleaniquecoders/nadi-php",
-    "description": "Nadi for PHP",
+    "name": "nadi-pro/nadi-php",
+    "description": "A PHP SDK for Nadi (http://nadi.pro)",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "CleaniqueCoders\\Nadi\\": "src/"
+            "Nadi\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "CleaniqueCoders\\Nadi\\Tests\\": "tests/"
+            "Nadi\\Tests\\": "tests/"
         }
     },
     "authors": [

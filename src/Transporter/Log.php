@@ -1,8 +1,8 @@
 <?php
 
-namespace CleaniqueCoders\Nadi\Transporter;
+namespace Nadi\Transporter;
 
-use CleaniqueCoders\Nadi\Concerns\InteractsWithTransporterId;
+use Nadi\Concerns\InteractsWithTransporterId;
 
 class Log implements Contract
 {

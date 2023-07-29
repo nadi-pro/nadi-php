@@ -1,6 +1,6 @@
 <?php
 
-namespace CleaniqueCoders\Nadi\Metric;
+namespace Nadi\Metric;
 
 interface Contract
 {

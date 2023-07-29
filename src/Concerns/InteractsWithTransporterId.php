@@ -1,6 +1,6 @@
 <?php
 
-namespace CleaniqueCoders\Nadi\Concerns;
+namespace Nadi\Concerns;
 
 trait InteractsWithTransporterId
 {

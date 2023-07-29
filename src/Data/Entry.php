@@ -1,10 +1,10 @@
 <?php
 
-namespace CleaniqueCoders\Nadi\Data;
+namespace Nadi\Data;
 
-use CleaniqueCoders\Nadi\Exceptions\TypeException;
-use CleaniqueCoders\Nadi\Metric\Contract;
-use CleaniqueCoders\Nadi\Metric\Metric;
+use Nadi\Exceptions\TypeException;
+use Nadi\Metric\Contract;
+use Nadi\Metric\Metric;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
 
@@ -48,7 +48,7 @@ class Entry
     /**
      * The currently request metric.
      *
-     * @var \CleaniqueCoders\Nadi\Metric\Metric
+     * @var \Nadi\Metric\Metric
      */
     public $metric;
 

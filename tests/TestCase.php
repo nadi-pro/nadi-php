@@ -1,6 +1,6 @@
 <?php
 
-namespace CleaniqueCoders\Nadi\Tests;
+namespace Nadi\Tests;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
 {

@@ -18,7 +18,7 @@ You can add a new metric as you see fit to your application / framework.
 
 Do take note, all metrics will be converted to associative array.
 
-In order to create your own metrics, you need to extends the class `CleaniqueCoders\Nadi\Metric\Base` and implement your metrics details in `metrics()` method which always return an array. You may need to define as a dot notation in your metric.
+In order to create your own metrics, you need to extends the class `Nadi\Metric\Base` and implement your metrics details in `metrics()` method which always return an array. You may need to define as a dot notation in your metric.
 
 However, Nadi will convert to the associative array.
 
@@ -29,8 +29,8 @@ Following is an example for capture Http request for Laravel framework.
 
 namespace App\Metric;
 
-use CleaniqueCoders\Nadi\Support\Arr;
-use CleaniqueCoders\Nadi\Metric\Base;
+use Nadi\Support\Arr;
+use Nadi\Metric\Base;
 use Illuminate\Support\Str;
 
 class Http extends Base
@@ -66,7 +66,7 @@ Once you have declared your metric, you can use in your application:
 
 ```php
 use App\Metrics\Http;
-use CleaniqueCoders\Nadi\Metric\Metric;
+use Nadi\Metric\Metric;
 
 $metric = new Metric();
 

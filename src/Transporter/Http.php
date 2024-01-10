@@ -41,7 +41,7 @@ class Http implements Contract
                 'headers' => [
                     'Accept' => 'application/vnd.nadi.'.$version.'+json',
                     'Authorization' => 'Bearer '.$key,
-                    'Nadi-Token' => $token,
+                    'Nadi-App-Token' => $token,
                     'Nadi-Transporter-Id' => $this->getTransporterId(),
                     'Content-Type' => 'application/json',
                 ],

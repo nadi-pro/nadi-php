@@ -13,7 +13,7 @@ class Http implements Contract
 
     const VERSION = 'v1';
 
-    const ENDPOINT = 'https://nadi.cleaniquecoders.com/api';
+    const ENDPOINT = 'https://nadi.pro/api';
 
     protected Client $client;
 

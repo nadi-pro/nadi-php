@@ -10,7 +10,8 @@ class Browser extends Base
 {
     public function metrics(): array
     {
-        $browser = (new Parser(null, request()))->detect()->toArray();
+        $request = function_exists('request') ? request() : null;
+        $browser = (new Parser(null, $request)->detect()->toArray();
         foreach ($browser as $key => $value) {
             unset($browser[$key]);
             $key = str_replace(['browser', 'is'], '', $key);

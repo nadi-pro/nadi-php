@@ -2,10 +2,10 @@
 
 namespace Nadi\Transporter;
 
-use Nadi\Concerns\InteractsWithTransporterId;
-use Nadi\Exceptions\TransporterException;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use Nadi\Concerns\InteractsWithTransporterId;
+use Nadi\Exceptions\TransporterException;
 
 class Http implements Contract
 {

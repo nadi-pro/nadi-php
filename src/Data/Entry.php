@@ -2,10 +2,10 @@
 
 namespace Nadi\Data;
 
+use Illuminate\Support\Str;
 use Nadi\Exceptions\TypeException;
 use Nadi\Metric\Contract;
 use Nadi\Metric\Metric;
-use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
 
 class Entry
@@ -191,7 +191,7 @@ class Entry
 
     public function getTitle(): string
     {
-        if(empty($this->title)) {
+        if (empty($this->title)) {
             switch ($this->getType()) {
                 case Type::EXCEPTION:
                     $this->title = data_get($this->getContent(), 'message');
@@ -215,7 +215,7 @@ class Entry
                     $this->title = '';
                     break;
                 case Type::COMMAND:
-                    $this->title = 'Failed command for '.data_get($this->getContent(), 'command');;
+                    $this->title = 'Failed command for '.data_get($this->getContent(), 'command');
                     break;
                 case Type::GATE:
                     $this->title = '';
@@ -232,6 +232,7 @@ class Entry
                     break;
             }
         }
+
         return Str::limit($this->title, 250);
     }
 
@@ -244,16 +245,16 @@ class Entry
 
     public function getDescription(): string
     {
-        if(empty($this->description)) {
+        if (empty($this->description)) {
             switch ($this->getType()) {
                 case Type::EXCEPTION:
-                    $this->description = data_get($this->getContent(), 'class') . ' thrown in ' . data_get($this->getContent(), 'file') . ' at line ' . data_get($this->getContent(), 'line') . '.';
+                    $this->description = data_get($this->getContent(), 'class').' thrown in '.data_get($this->getContent(), 'file').' at line '.data_get($this->getContent(), 'line').'.';
                     break;
                 case Type::QUERY:
-                    $this->description = 'Slow query detected for ' . data_get($this->getContent(), 'connection') . ' connection. Time duration for the query excecuted is: ' . data_get($this->getContent(), 'time') . '.';
+                    $this->description = 'Slow query detected for '.data_get($this->getContent(), 'connection').' connection. Time duration for the query excecuted is: '.data_get($this->getContent(), 'time').'.';
                     break;
                 case Type::QUEUE:
-                    $this->description = 'Queue Job ' . data_get($this->getContent(), 'data.name') . ' failed after ' . data_get($this->getContent(), 'data.tries') . ' tries.';
+                    $this->description = 'Queue Job '.data_get($this->getContent(), 'data.name').' failed after '.data_get($this->getContent(), 'data.tries').' tries.';
                     break;
                 case Type::HTTP:
                     $this->description = data_get($this->getContent(), 'description');
@@ -262,7 +263,7 @@ class Entry
                     $this->description = '';
                     break;
                 case Type::NOTIFICATION:
-                    $this->description = 'Failed notification for ' . data_get($this->getContent(), 'notifiable');
+                    $this->description = 'Failed notification for '.data_get($this->getContent(), 'notifiable');
                     break;
                 case Type::SCHEDULER:
                     $this->description = '';
@@ -285,6 +286,7 @@ class Entry
                     break;
             }
         }
+
         return $this->description;
     }
 

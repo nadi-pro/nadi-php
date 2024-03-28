@@ -2,14 +2,14 @@
 
 namespace Nadi\Tests\Features;
 
-use Nadi\Exceptions\TransporterException;
-use Nadi\Tests\TestCase;
-use Nadi\Transporter\Http;
-use Nadi\Transporter\Log;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use Nadi\Exceptions\TransporterException;
+use Nadi\Tests\TestCase;
+use Nadi\Transporter\Http;
+use Nadi\Transporter\Log;
 
 class CoreTest extends TestCase
 {

@@ -111,9 +111,10 @@ class CoreTest extends TestCase
 
         $this->assertTrue($transporter->test());
         $this->assertTrue($transporter->verify());
-        $this->assertTrue($transporter->send([
+        $transporter->store([
             'type' => 'Query',
-        ])->getStatusCode() == 200);
+        ]);
+        $this->assertTrue($transporter->send()->getStatusCode() == 200);
     }
 
     /**
@@ -259,7 +260,8 @@ class CoreTest extends TestCase
         $transporter->setClient($client);
 
         if ($samplingManager->shouldSample()) {
-            $response = $transporter->send(['type' => 'Query']);
+            $transporter->store(['type' => 'Query']);
+            $response = $transporter->send();
             $this->assertEquals(200, $response->getStatusCode());
         }
     }

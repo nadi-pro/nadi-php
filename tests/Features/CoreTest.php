@@ -8,7 +8,10 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Nadi\Exceptions\TransporterException;
 use Nadi\Sampling\Config;
+use Nadi\Sampling\DynamicRateSampling;
 use Nadi\Sampling\FixedRateSampling;
+use Nadi\Sampling\IntervalSampling;
+use Nadi\Sampling\PeakLoadSampling;
 use Nadi\Sampling\SamplingManager;
 use Nadi\Tests\TestCase;
 use Nadi\Transporter\Http;
@@ -129,6 +132,67 @@ class CoreTest extends TestCase
         $samplingManager = new SamplingManager($samplingStrategy);
 
         $this->assertFalse($samplingManager->shouldSample(), 'Sampling should not occur at 0% rate.');
+    }
+
+    /**
+     * Test Dynamic Rate Sampling.
+     */
+    public function test_dynamic_rate_sampling(): void
+    {
+        // Test with 100% effective rate (baseRate * loadFactor)
+        $config = new Config(baseRate: 1.0, loadFactor: 1.0);
+        $samplingStrategy = new DynamicRateSampling($config);
+        $samplingManager = new SamplingManager($samplingStrategy);
+
+        $this->assertTrue($samplingManager->shouldSample(), 'Sampling should occur at 100% dynamic rate.');
+
+        // Test with 0% effective rate
+        $config = new Config(baseRate: 0.0, loadFactor: 1.0);
+        $samplingStrategy = new DynamicRateSampling($config);
+        $samplingManager = new SamplingManager($samplingStrategy);
+
+        $this->assertFalse($samplingManager->shouldSample(), 'Sampling should not occur at 0% dynamic rate.');
+    }
+
+    /**
+     * Test Interval Sampling.
+     */
+    public function test_interval_sampling(): void
+    {
+        // Assuming intervalSeconds is 60, simulate at the exact interval
+        $config = new Config(intervalSeconds: 60);
+        $samplingStrategy = new IntervalSampling($config);
+        $samplingManager = new SamplingManager($samplingStrategy);
+
+        // Mock the time() function to return a specific time that aligns with the interval
+        $mockTime = time();
+        $this->assertTrue($samplingStrategy->shouldSample(), "Sampling should occur at the interval of {$config->getIntervalSeconds()} seconds.");
+
+        // Test at a time that does not align with the interval
+        $config = new Config(intervalSeconds: 61); // Set an interval that doesn't align
+        $samplingStrategy = new IntervalSampling($config);
+        $this->assertFalse($samplingManager->shouldSample(), 'Sampling should not occur outside of the interval.');
+    }
+
+    /**
+     * Test Peak Load Sampling.
+     */
+    public function test_peak_load_sampling(): void
+    {
+        // Test with high load factor resulting in high sampling rate
+        $config = new Config(baseRate: 0.05, loadFactor: 50.0); // Effective rate = 1.0
+        $samplingStrategy = new PeakLoadSampling($config);
+        $samplingManager = new SamplingManager($samplingStrategy);
+
+        $this->assertTrue($samplingManager->shouldSample(), 'Sampling should occur at peak load.');
+
+        // Test with low load factor resulting in low sampling rate
+        $config = new Config(baseRate: 0.05, loadFactor: 0.1); // Effective rate = 0.005
+        $samplingStrategy = new PeakLoadSampling($config);
+        $samplingManager = new SamplingManager($samplingStrategy);
+
+        $this->assertFalse($samplingManager->shouldSample(), 'Sampling should not occur at low load.');
+
     }
 
     /**

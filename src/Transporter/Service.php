@@ -1,6 +1,6 @@
 <?php
 
-namespace Nadi\Services;
+namespace Nadi\Transporter;
 
 use Nadi\Sampling\SamplingManager;
 use Nadi\Transporter\Contract as Transporter;

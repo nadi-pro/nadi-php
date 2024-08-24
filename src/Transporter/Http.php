@@ -72,6 +72,10 @@ class Http implements Contract
 
     public function send()
     {
+        if (empty($this->storage)) {
+            return true;
+        }
+
         return $this->client->post($this->url('record'), [RequestOptions::JSON => $this->storage]);
     }
 

@@ -67,6 +67,10 @@ class Log implements Contract
 
     public function send()
     {
+        if (empty($this->storage)) {
+            return true;
+        }
+
         $data = $this->storage;
         $filename = $this->getTransporterId();
         $filepath = $this->getPath().DIRECTORY_SEPARATOR.$filename.'.json';

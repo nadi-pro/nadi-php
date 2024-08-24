@@ -7,6 +7,9 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Nadi\Exceptions\TransporterException;
+use Nadi\Sampling\Config;
+use Nadi\Sampling\FixedRateSampling;
+use Nadi\Sampling\SamplingManager;
 use Nadi\Tests\TestCase;
 use Nadi\Transporter\Http;
 use Nadi\Transporter\Log;
@@ -108,5 +111,89 @@ class CoreTest extends TestCase
         $this->assertTrue($transporter->send([
             'type' => 'Query',
         ])->getStatusCode() == 200);
+    }
+
+    /**
+     * Test Fixed Rate Sampling.
+     */
+    public function test_fixed_rate_sampling(): void
+    {
+        $config = new Config(samplingRate: 1.0); // 100% sampling rate
+        $samplingStrategy = new FixedRateSampling($config);
+        $samplingManager = new SamplingManager($samplingStrategy);
+
+        $this->assertTrue($samplingManager->shouldSample(), 'Sampling should occur at 100% rate.');
+
+        $config = new Config(samplingRate: 0.0); // 0% sampling rate
+        $samplingStrategy = new FixedRateSampling($config);
+        $samplingManager = new SamplingManager($samplingStrategy);
+
+        $this->assertFalse($samplingManager->shouldSample(), 'Sampling should not occur at 0% rate.');
+    }
+
+    /**
+     * Test Log Transporter with Sampling.
+     */
+    public function test_log_transporter_with_sampling(): void
+    {
+        $config = new Config(samplingRate: 1.0); // 100% sampling rate
+        $samplingStrategy = new FixedRateSampling($config);
+        $samplingManager = new SamplingManager($samplingStrategy);
+
+        $transporter = new Log;
+        $transporter->configure();
+
+        $this->assertTrue($transporter->test());
+
+        $this->assertTrue($transporter->verify());
+
+        if ($samplingManager->shouldSample()) {
+            $transporter->store(['message' => 'Sampled log message']);
+            $this->assertTrue(file_exists($transporter->getFilePath()));
+        }
+
+        unlink($transporter->getFilePath());
+    }
+
+    /**
+     * Test Http Transporter with Sampling.
+     */
+    public function test_http_transporter_with_sampling(): void
+    {
+        $config = new Config(samplingRate: 1.0); // 100% sampling rate
+        $samplingStrategy = new FixedRateSampling($config);
+        $samplingManager = new SamplingManager($samplingStrategy);
+
+        $headers = [
+            'Accept' => 'application/vnd.nadi.'.Http::VERSION.'+json',
+            'Authorization' => 'Bearer unittest-key',
+            'Nadi-Token' => 'unittest-token',
+            'Nadi-Transporter-Id' => '07f44616ac3c5812d914d8ea537b0df70abd69205cc278019547e27bddabf3e1',
+            'Content-Type' => 'application/json',
+        ];
+
+        $mock = new MockHandler([
+            new Response(200, $headers),
+            new Response(200, $headers),
+            new Response(200, $headers),
+        ]);
+
+        $handler = HandlerStack::create($mock);
+        $client = new Client([
+            'handler' => $handler,
+            'headers' => $headers,
+        ]);
+
+        $transporter = new Http;
+        $transporter->configure([
+            'key' => 'unittest-key',
+            'token' => 'unittest-token',
+        ]);
+        $transporter->setClient($client);
+
+        if ($samplingManager->shouldSample()) {
+            $response = $transporter->send(['type' => 'Query']);
+            $this->assertEquals(200, $response->getStatusCode());
+        }
     }
 }

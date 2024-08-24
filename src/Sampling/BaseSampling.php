@@ -2,7 +2,7 @@
 
 namespace Nadi\Sampling;
 
-class DefaultSampling implements Contract
+class BaseSampling implements Contract
 {
     public function __construct(protected Config $config) {}
 

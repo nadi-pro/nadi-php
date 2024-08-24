@@ -2,7 +2,7 @@
 
 namespace Nadi\Sampling;
 
-class PeakLoadSampling extends DefaultSampling
+class PeakLoadSampling extends BaseSampling
 {
     public function shouldSample(): bool
     {

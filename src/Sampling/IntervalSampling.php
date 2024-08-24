@@ -2,7 +2,7 @@
 
 namespace Nadi\Sampling;
 
-class IntervalSampling extends DefaultSampling
+class IntervalSampling extends BaseSampling
 {
     public function shouldSample(): bool
     {

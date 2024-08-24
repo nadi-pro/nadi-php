@@ -2,7 +2,7 @@
 
 namespace Nadi\Sampling;
 
-class DynamicRateSampling extends DefaultSampling
+class DynamicRateSampling extends BaseSampling
 {
     public function shouldSample(): bool
     {

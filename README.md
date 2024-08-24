@@ -88,3 +88,82 @@ If you are adding from Laravel framework, you can simply just add in `config/nad
 <center>
 <img src="nadi-php-uml-diagram.png">
 </center>
+
+## Sampling
+
+Following are the sampling strategy provided by default:
+
+1. [Base Sampling](src/Sampling/BaseSampling.php)
+2. [Fix Rate Sampling](src/Sampling/FixedRateSampling.php)
+3. [Interval Sampling](src/Sampling/IntervalSampling.php)
+4. [Peak Load Sampling](src/Sampling/PeakLoadSampling.php)
+5. [Dynamic Rate Sampling](src/Sampling/DynamicRateSampling.php)
+
+### Usage
+
+The Sample [Config](src/Sampling/Config.php) can be construct as following:
+
+```php
+use Nadi\Sampling\Config;
+
+$config = new Config(
+    samplingRate: 0.1,
+    baseRate: 0.05,
+    loadFactor: 1.0,
+    intervalSeconds: 60
+);
+```
+
+Then based on available sampling strategy, contruct the sampling object:
+
+```php
+use Nadi\Sampling\FixedRateSampling;
+
+$samplingStrategy = new FixedRateSampling($config);
+```
+
+You can use directly the sampling:
+
+```php
+if($samplingStrategy->shouldSample()) {
+    // do something
+}
+```
+
+Or you require [Sampling Manager](src/Sampling/SamplingManager.php):
+
+```php
+use Nadi\Sampling\SamplingManager;
+
+$samplingManager = new SamplingManager($samplingStrategy);
+
+if($samplingManager->shouldSample()) {
+    // do something
+}
+```
+
+> Use Sampling Manager if you rely on dynamic use of sampling stategy.
+
+### Create Your Own Sample Strategy
+
+To create your own sampling strategy:
+
+```php
+
+namespace App\Sampling;
+
+use Nadi\Sampling\Contract;
+use Nadi\Sampling\Config;
+
+class CustomSampling implements Contract
+{
+    public function __construct(protected Config $config) {}
+
+    public function shouldSample(): bool
+    {
+        // do your logic hhere
+
+        return true;
+    }
+}
+```

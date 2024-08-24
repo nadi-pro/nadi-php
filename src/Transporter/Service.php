@@ -17,14 +17,24 @@ class Service
         $this->samplingManager = $samplingManager;
     }
 
-    public function handleEvent(array $data)
+    public function handle(array $data)
     {
         if ($this->samplingManager->shouldSample()) {
             $this->transporter->store($data);
         }
     }
 
-    public function sendLogs()
+    public function test()
+    {
+        return $this->transporter->test();
+    }
+
+    public function verify()
+    {
+        return $this->transporter->verify();
+    }
+
+    public function send()
     {
         $this->transporter->send();
     }

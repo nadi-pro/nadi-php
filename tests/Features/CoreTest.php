@@ -159,18 +159,21 @@ class CoreTest extends TestCase
      */
     public function test_interval_sampling(): void
     {
-        // Assuming intervalSeconds is 60, simulate at the exact interval
-        $config = new Config(intervalSeconds: 60);
+        // Test at a time that aligns with the interval
+        $config = new Config(intervalSeconds: 60); // Sample every 60 seconds
         $samplingStrategy = new IntervalSampling($config);
         $samplingManager = new SamplingManager($samplingStrategy);
 
-        // Mock the time() function to return a specific time that aligns with the interval
-        $mockTime = time();
+        // // Mock time to align with the interval
+        $samplingStrategy->setTimestamp(1627857600);
         $this->assertTrue($samplingStrategy->shouldSample(), "Sampling should occur at the interval of {$config->getIntervalSeconds()} seconds.");
 
         // Test at a time that does not align with the interval
-        $config = new Config(intervalSeconds: 61); // Set an interval that doesn't align
+        $mockTime = 1627857601; // 60 seconds after the interval
         $samplingStrategy = new IntervalSampling($config);
+        $samplingManager = new SamplingManager($samplingStrategy);
+        $samplingStrategy->setTimestamp($mockTime);
+
         $this->assertFalse($samplingManager->shouldSample(), 'Sampling should not occur outside of the interval.');
     }
 

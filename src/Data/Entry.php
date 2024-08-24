@@ -85,7 +85,7 @@ class Entry
 
         $this->type = $type;
 
-        $this->recorded_at = new \DateTimeImmutable();
+        $this->recorded_at = new \DateTimeImmutable;
 
         $this->content = $content;
 

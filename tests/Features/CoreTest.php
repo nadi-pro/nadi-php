@@ -18,7 +18,7 @@ class CoreTest extends TestCase
      */
     public function test_default_log_transporter(): void
     {
-        $transporter = (new Log());
+        $transporter = (new Log);
         $transporter->configure();
 
         $this->assertTrue($transporter->test());
@@ -33,7 +33,7 @@ class CoreTest extends TestCase
      */
     public function test_custom_log_transporter(): void
     {
-        $transporter = (new Log());
+        $transporter = (new Log);
         $path = dirname(__FILE__, 2).DIRECTORY_SEPARATOR.'logs';
         $gitignore_path = $path.DIRECTORY_SEPARATOR.'.gitignore';
         $transporter->configure([
@@ -60,7 +60,7 @@ class CoreTest extends TestCase
         $this->expectException(TransporterException::class);
         $this->expectExceptionMessage('Missing API Token');
 
-        $transporter = new Http();
+        $transporter = new Http;
         $transporter->configure();
 
         $this->expectException(TransporterException::class);
@@ -96,7 +96,7 @@ class CoreTest extends TestCase
             'headers' => $headers,
         ]);
 
-        $transporter = new Http();
+        $transporter = new Http;
         $transporter->configure([
             'key' => 'unittest-key',
             'token' => 'unittest-token',

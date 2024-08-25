@@ -19,7 +19,7 @@ class Service
 
     public function handle(array $data = [])
     {
-        if (!empty($data) && $this->samplingManager->shouldSample()) {
+        if (! empty($data) && $this->samplingManager->shouldSample()) {
             $this->transporter->store($data);
         }
     }

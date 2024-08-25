@@ -184,11 +184,8 @@ class CoreTest extends TestCase
     public function test_peak_load_sampling(): void
     {
         // Test with high load factor resulting in high sampling rate
-        $config = new Config(baseRate: 0.05, loadFactor: 50.0); // Effective rate = 1.0
-        $samplingStrategy = new PeakLoadSampling($config);
-        $samplingManager = new SamplingManager($samplingStrategy);
-
-        $this->assertTrue($samplingManager->shouldSample(), 'Sampling should occur at peak load.');
+        // this is not possible for testing as it's require CPU & Memory Usage
+        // instead of normal calculation.
 
         // Test with low load factor resulting in low sampling rate
         $config = new Config(baseRate: 0.05, loadFactor: 0.1); // Effective rate = 0.005

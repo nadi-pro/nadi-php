@@ -213,4 +213,55 @@ class OpenTelemetryTest extends TestCase
         // Send with empty storage should return true
         $this->assertTrue($transporter->send());
     }
+
+    public function test_opentelemetry_transporter_semantic_conventions_integration(): void
+    {
+        $transporter = new OpenTelemetry;
+        $transporter->configure([
+            'endpoint' => 'http://localhost:4318',
+            'service_name' => 'nadi-test-semantic',
+            'service_version' => '2.0.0',
+            'deployment_environment' => 'testing',
+        ]);
+
+        // Test entry with semantic convention data structure
+        $semanticEntry = [
+            'uuid' => 'semantic-test-uuid',
+            'type' => 'Exception',
+            'description' => 'Semantic conventions test',
+            'content' => [
+                'exception' => [
+                    'class' => 'RuntimeException',
+                    'message' => 'Test semantic exception',
+                    'file' => '/test/path/file.php',
+                    'line' => 123,
+                    'trace' => 'Test stack trace...',
+                ],
+                'http' => [
+                    'method' => 'GET',
+                    'url' => 'https://test.example.com',
+                    'status_code' => 500,
+                    'user_agent' => 'Test Agent/1.0',
+                ],
+                'database' => [
+                    'connection_name' => 'mysql_test',
+                    'query' => 'SELECT COUNT(*) FROM test_table',
+                    'duration' => 42.5,
+                ],
+                'user' => [
+                    'id' => 999,
+                    'name' => 'Test User',
+                    'email' => 'test@example.com',
+                ],
+                'session_id' => 'test-session-123',
+                'memory_usage' => 2048000,
+                'duration' => 250.75,
+            ],
+        ];
+
+        $transporter->store($semanticEntry);
+
+        // Should not throw any errors and return true
+        $this->assertTrue($transporter->send());
+    }
 }

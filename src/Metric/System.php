@@ -15,32 +15,129 @@ class System extends Base
         }
 
         return [
-            'system.server.cpu' => $this->getCpu(),
-            'system.server.memory.peak' => \memory_get_peak_usage(true),
-            'system.server.memory.usage' => \memory_get_usage(true),
-            'system.server.storage' => \disk_total_space($directory),
+            // OTel standard metrics with dot notation (converted by Arr::undot())
+            'system.cpu.load_average.1m' => $this->getCpuLoadAverage()[0] ?? 0,
+            'system.cpu.load_average.5m' => $this->getCpuLoadAverage()[1] ?? 0,
+            'system.cpu.load_average.15m' => $this->getCpuLoadAverage()[2] ?? 0,
+            'system.cpu.logical_count' => $this->getCpuCores(),
+            'system.memory.usage' => \memory_get_usage(true),
+            'system.memory.limit' => $this->getMemoryLimit(),
+            'system.memory.peak' => \memory_get_peak_usage(true),
+            'system.filesystem.usage' => \disk_total_space($directory) - \disk_free_space($directory),
+            'system.filesystem.available' => \disk_free_space($directory),
+            'system.filesystem.total' => \disk_total_space($directory),
         ];
     }
 
-    public function getCpu()
+    /**
+     * Get CPU load average
+     */
+    protected function getCpuLoadAverage(): array
     {
-        if (! strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        if (function_exists('sys_getloadavg')) {
             return \sys_getloadavg();
         }
 
-        if (! extension_loaded('com_dotnet')) {
-            return [];
+        if ($this->isWindows() && extension_loaded('com_dotnet')) {
+            return $this->getWindowsCpuLoad();
         }
 
-        $wmi = new \COM('winmgmts:{impersonationLevel=impersonate}!\\\\.\\root\\cimv2');
-        $query = 'SELECT LoadPercentage FROM Win32_Processor';
-        $loadPercentage = $wmi->ExecQuery($query);
+        return [0, 0, 0];
+    }
 
-        $load = [];
-        foreach ($loadPercentage as $processor) {
-            $load[] = $processor->LoadPercentage;
+    /**
+     * Get number of CPU cores
+     */
+    protected function getCpuCores(): int
+    {
+        $cores = 1;
+
+        if (is_file('/proc/cpuinfo')) {
+            $cores = (int) shell_exec('nproc');
+        } elseif ($this->isWindows()) {
+            $cores = (int) shell_exec('echo %NUMBER_OF_PROCESSORS%');
+        } elseif (stripos(PHP_OS, 'darwin') === 0 || stripos(PHP_OS, 'bsd') !== false) {
+            $cores = (int) shell_exec('sysctl -n hw.ncpu');
         }
 
-        return $load;
+        return max($cores, 1);
+    }
+
+    /**
+     * Get memory limit in bytes
+     */
+    protected function getMemoryLimit(): int
+    {
+        $memoryLimit = ini_get('memory_limit');
+
+        if ($memoryLimit === '-1') {
+            return PHP_INT_MAX;
+        }
+
+        return $this->convertToBytes($memoryLimit);
+    }
+
+    /**
+     * Convert memory string to bytes
+     */
+    protected function convertToBytes(string $value): int
+    {
+        $value = trim($value);
+        $unit = strtolower($value[strlen($value) - 1]);
+        $number = (int) substr($value, 0, -1);
+
+        switch ($unit) {
+            case 'g':
+                return $number * 1024 * 1024 * 1024;
+            case 'm':
+                return $number * 1024 * 1024;
+            case 'k':
+                return $number * 1024;
+            default:
+                return (int) $value;
+        }
+    }
+
+    /**
+     * Get Windows CPU load
+     */
+    protected function getWindowsCpuLoad(): array
+    {
+        try {
+            $wmi = new \COM('winmgmts:{impersonationLevel=impersonate}!\\\\.\\root\\cimv2');
+            $query = 'SELECT LoadPercentage FROM Win32_Processor';
+            $loadPercentage = $wmi->ExecQuery($query);
+
+            $load = [];
+            foreach ($loadPercentage as $processor) {
+                $load[] = $processor->LoadPercentage / 100;
+            }
+
+            $avgLoad = ! empty($load) ? array_sum($load) / count($load) : 0;
+
+            return [$avgLoad, $avgLoad, $avgLoad];
+        } catch (\Throwable $e) {
+            return [0, 0, 0];
+        }
+    }
+
+    /**
+     * Check if running on Windows
+     */
+    protected function isWindows(): bool
+    {
+        return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+    }
+
+    /**
+     * Deprecated: Use getCpuLoadAverage() instead
+     *
+     * @return array
+     *
+     * @deprecated
+     */
+    public function getCpu()
+    {
+        return $this->getCpuLoadAverage();
     }
 }

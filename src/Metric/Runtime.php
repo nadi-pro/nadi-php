@@ -7,8 +7,11 @@ class Runtime extends Base
     public function metrics(): array
     {
         return [
-            'runtime.name' => 'PHP',
-            'runtime.version' => \phpversion(),
+            // OTel semantic conventions for process runtime
+            'process.runtime.name' => 'php',
+            'process.runtime.version' => \phpversion(),
+            'process.runtime.description' => 'PHP '.\phpversion(),
+            'process.pid' => \getmypid(),
         ];
     }
 }

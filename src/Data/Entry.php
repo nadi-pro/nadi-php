@@ -74,6 +74,20 @@ class Entry
     public $recorded_at;
 
     /**
+     * The OpenTelemetry trace ID for correlation.
+     *
+     * @var string|null
+     */
+    public $traceId;
+
+    /**
+     * The OpenTelemetry span ID for correlation.
+     *
+     * @var string|null
+     */
+    public $spanId;
+
+    /**
      * Create a new incoming entry instance.
      *
      * @param  string|null  $uuid
@@ -90,6 +104,69 @@ class Entry
         $this->content = $content;
 
         $this->metric = new Metric;
+
+        // Capture OpenTelemetry trace context if available
+        $this->captureTraceContext();
+    }
+
+    /**
+     * Capture the current OpenTelemetry trace context
+     */
+    protected function captureTraceContext(): void
+    {
+        try {
+            if (class_exists('\OpenTelemetry\API\Trace\Span')) {
+                $span = \OpenTelemetry\API\Trace\Span::getCurrent();
+                $spanContext = $span->getContext();
+
+                if ($spanContext->isValid()) {
+                    $this->traceId = $spanContext->getTraceId();
+                    $this->spanId = $spanContext->getSpanId();
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silently fail if OTel is not available or configured
+        }
+    }
+
+    /**
+     * Set the trace ID for this entry
+     *
+     * @return $this
+     */
+    public function setTraceId(string $traceId): self
+    {
+        $this->traceId = $traceId;
+
+        return $this;
+    }
+
+    /**
+     * Set the span ID for this entry
+     *
+     * @return $this
+     */
+    public function setSpanId(string $spanId): self
+    {
+        $this->spanId = $spanId;
+
+        return $this;
+    }
+
+    /**
+     * Get the trace ID
+     */
+    public function getTraceId(): ?string
+    {
+        return $this->traceId;
+    }
+
+    /**
+     * Get the span ID
+     */
+    public function getSpanId(): ?string
+    {
+        return $this->spanId;
     }
 
     /**
@@ -302,7 +379,7 @@ class Entry
      */
     public function toArray()
     {
-        return [
+        $data = [
             'uuid' => $this->uuid,
             'title' => $this->getTitle(),
             'description' => $this->getDescription(),
@@ -312,5 +389,16 @@ class Entry
             'meta' => $this->metric->toArray(),
             'created_at' => $this->recorded_at->format('Y-m-d H:i:s'),
         ];
+
+        // Add OpenTelemetry trace context if available
+        if ($this->traceId) {
+            $data['trace_id'] = $this->traceId;
+        }
+
+        if ($this->spanId) {
+            $data['span_id'] = $this->spanId;
+        }
+
+        return $data;
     }
 }

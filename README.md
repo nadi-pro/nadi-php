@@ -4,12 +4,205 @@
 
 # Nadi PHP Client
 
-Nadi is a simple issue tracker for monitoring your application crashes. This package developed for PHP.
+Nadi is a simple issue tracker for monitoring your application crashes. This package developed for PHP with built-in OpenTelemetry support for industry-standard observability.
+
+## Requirements
+
+- PHP 8.1 or higher
+- Composer
 
 ## Installation
 
 ```bash
 composer require nadi-pro/nadi-php
+```
+
+## Features
+
+- 🔭 **OpenTelemetry Integration**: Built-in support for OTel semantic conventions
+- 📊 **Rich Metrics**: Comprehensive system, runtime, network, and custom metrics
+- 🎯 **Smart Sampling**: Multiple sampling strategies including fixed-rate, interval-based, peak-load, and dynamic
+- 🚀 **Multiple Transporters**: HTTP API, Local Logging, and OpenTelemetry exporters
+- 🔄 **Trace Correlation**: Automatic trace context capture for distributed tracing
+
+## OpenTelemetry Support
+
+Nadi PHP SDK now includes first-class support for OpenTelemetry (OTel), enabling seamless integration with modern observability platforms like Jaeger, Prometheus, Grafana, Datadog, and New Relic.
+
+### OpenTelemetry Transporter
+
+Configure Nadi to export telemetry data using the OpenTelemetry Protocol (OTLP):
+
+```php
+use Nadi\Transporter\OpenTelemetry;
+use Nadi\Data\Entry;
+use Nadi\Data\Type;
+
+// Configure OpenTelemetry transporter
+$transporter = new OpenTelemetry();
+$transporter->configure([
+    'endpoint' => 'http://localhost:4318',  // OTLP endpoint
+    'service_name' => 'my-php-app',
+    'service_version' => '1.0.0',
+]);
+
+// Create an entry
+$entry = Entry::make(Type::EXCEPTION, [
+    'class' => 'RuntimeException',
+    'message' => 'An error occurred',
+    'file' => __FILE__,
+    'line' => __LINE__,
+]);
+
+// Store and send
+$transporter->store($entry->toArray());
+$transporter->send();
+```
+
+### OpenTelemetry Semantic Conventions
+
+All metrics now follow OTel semantic conventions for consistency and interoperability:
+
+#### System Metrics
+
+```php
+use Nadi\Metric\System;
+
+$system = new System();
+$metrics = $system->toArray();
+
+// Returns OTel-compliant metrics:
+// - system.cpu.load_average.1m
+// - system.cpu.load_average.5m
+// - system.cpu.load_average.15m
+// - system.cpu.logical_count
+// - system.memory.usage
+// - system.memory.limit
+// - system.memory.peak
+// - system.filesystem.usage
+// - system.filesystem.available
+// - system.filesystem.total
+```
+
+#### Runtime Metrics
+
+```php
+use Nadi\Metric\Runtime;
+
+$runtime = new Runtime();
+$metrics = $runtime->toArray();
+
+// Returns:
+// - process.runtime.name: 'php'
+// - process.runtime.version: '8.3.0'
+// - process.runtime.description: 'PHP 8.3.0'
+// - process.pid: 12345
+```
+
+#### Operating System Metrics
+
+```php
+use Nadi\Metric\OperatingSystem;
+
+$os = new OperatingSystem();
+$metrics = $os->toArray();
+
+// Returns:
+// - os.type: 'darwin'
+// - os.description: 'Darwin 23.0.0'
+// - os.name: 'Darwin'
+// - os.version: '23.0.0'
+// - host.name: 'macbook-pro.local'
+// - host.arch: 'x86_64'
+```
+
+#### Network Metrics
+
+```php
+use Nadi\Metric\Network;
+
+$network = new Network();
+$metrics = $network->toArray();
+
+// Returns:
+// - host.name: 'server-01'
+// - host.id: 'unique-machine-id'
+```
+
+### Trace Context Correlation
+
+Nadi automatically captures OpenTelemetry trace context for distributed tracing:
+
+```php
+use Nadi\Data\Entry;
+use Nadi\Data\Type;
+
+// Entry automatically captures active OTel span context
+$entry = Entry::make(Type::EXCEPTION, [
+    'class' => 'DatabaseException',
+    'message' => 'Connection failed',
+]);
+
+// Or set manually
+$entry->setTraceId('4bf92f3577b34da6a3ce929d0e0e4736');
+$entry->setSpanId('00f067aa0ba902b7');
+
+// Trace IDs are included in exported data
+$data = $entry->toArray();
+// Contains: trace_id, span_id
+```
+
+### Connecting to Observability Backends
+
+#### Jaeger
+
+```php
+$transporter->configure([
+    'endpoint' => 'http://jaeger:4318',
+    'service_name' => 'my-app',
+]);
+```
+
+#### Grafana Tempo
+
+```php
+$transporter->configure([
+    'endpoint' => 'http://tempo:4318',
+    'service_name' => 'my-app',
+]);
+```
+
+#### Local Development (Jaeger All-in-One)
+
+```bash
+# Run Jaeger
+docker run -d --name jaeger \
+  -p 4318:4318 \
+  -p 16686:16686 \
+  jaegertracing/all-in-one:latest
+
+# Access UI at http://localhost:16686
+```
+
+## Testing
+
+Run the test suite:
+
+```bash
+composer test
+```
+
+**Note:** OpenTelemetry tests may show connection warnings if Jaeger is not running locally. These are expected and the tests will still pass. To run tests with a live OTLP endpoint, start Jaeger first:
+
+```bash
+# Start Jaeger for testing
+docker run -d --name jaeger -p 4318:4318 -p 16686:16686 jaegertracing/all-in-one:latest
+
+# Run tests
+composer test
+
+# Stop Jaeger
+docker stop jaeger && docker rm jaeger
 ```
 
 ## Adding New Metric

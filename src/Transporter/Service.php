@@ -36,6 +36,6 @@ class Service
 
     public function send()
     {
-        $this->transporter->send();
+        return $this->transporter->send();
     }
 }

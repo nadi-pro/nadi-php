@@ -15,6 +15,12 @@ class Http implements Contract
 
     const ENDPOINT = 'https://nadi.pro/api';
 
+    /**
+     * Authentication schemes supported by the transporter.
+     */
+    const AUTH_LEGACY = 'legacy';       // Authorization Bearer + Nadi-App-Token
+    const AUTH_APP_SECRET = 'app_secret'; // Nadi-App-Id + Nadi-App-Secret
+
     protected Client $client;
 
     protected string $endpoint;
@@ -23,32 +29,72 @@ class Http implements Contract
 
     protected $storage = [];
 
+    protected string $authScheme = self::AUTH_LEGACY;
+
     public function configure(array $configurations = []): self
     {
         $this->configurations = $configurations;
 
-        $key = isset($this->configurations['key']) ? $this->configurations['key'] : null;
-        $token = isset($this->configurations['token']) ? $this->configurations['token'] : null;
-        $version = isset($this->configurations['version']) ? $this->configurations['version'] : self::VERSION;
-        $endpoint = isset($this->configurations['endpoint']) ? $this->configurations['endpoint'] : self::ENDPOINT;
-
-        TransporterException::throwIfMissingCredentials($key, $token);
+        $version = $this->configurations['version'] ?? self::VERSION;
+        $endpoint = $this->configurations['endpoint'] ?? self::ENDPOINT;
 
         $this->endpoint = $endpoint;
 
+        // Determine authentication scheme based on provided credentials
+        $headers = $this->buildAuthHeaders($version);
+
         $this->setClient(
             new Client([
-                'headers' => [
-                    'Accept' => 'application/vnd.nadi.'.$version.'+json',
-                    'Authorization' => 'Bearer '.$key,
-                    'Nadi-App-Token' => $token,
-                    'Nadi-Transporter-Id' => $this->getTransporterId(),
-                    'Content-Type' => 'application/json',
-                ],
+                'headers' => $headers,
             ])
         );
 
         return $this;
+    }
+
+    /**
+     * Build authentication headers based on available credentials.
+     * Prefers new App ID + Secret scheme if both are provided.
+     */
+    protected function buildAuthHeaders(string $version): array
+    {
+        $headers = [
+            'Accept' => 'application/vnd.nadi.'.$version.'+json',
+            'Nadi-Transporter-Id' => $this->getTransporterId(),
+            'Content-Type' => 'application/json',
+        ];
+
+        // Check for new auth scheme (App ID + App Secret)
+        $appId = $this->configurations['app_id'] ?? null;
+        $appSecret = $this->configurations['app_secret'] ?? null;
+
+        if ($appId && $appSecret) {
+            $this->authScheme = self::AUTH_APP_SECRET;
+            $headers['Nadi-App-Id'] = $appId;
+            $headers['Nadi-App-Secret'] = $appSecret;
+
+            return $headers;
+        }
+
+        // Fall back to legacy auth (Bearer + App Token)
+        $key = $this->configurations['key'] ?? null;
+        $token = $this->configurations['token'] ?? null;
+
+        TransporterException::throwIfMissingCredentials($key, $token);
+
+        $this->authScheme = self::AUTH_LEGACY;
+        $headers['Authorization'] = 'Bearer '.$key;
+        $headers['Nadi-App-Token'] = $token;
+
+        return $headers;
+    }
+
+    /**
+     * Get the current authentication scheme being used.
+     */
+    public function getAuthScheme(): string
+    {
+        return $this->authScheme;
     }
 
     public function setClient(Client $client): self

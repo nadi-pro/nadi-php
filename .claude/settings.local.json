@@ -4,7 +4,14 @@
       "Bash(composer show:*)",
       "Bash(composer require:*)",
       "Bash(curl:*)",
-      "Bash(composer test:*)"
+      "Bash(composer test:*)",
+      "Bash(go get:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(xargs ls:*)",
+      "Bash(wc:*)",
+      "Bash(php -l:*)",
+      "Bash(git push:*)"
     ]
   }
 }

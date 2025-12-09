@@ -64,16 +64,23 @@ class CoreTest extends TestCase
     public function test_http_transporter_exceptions(): void
     {
         $this->expectException(TransporterException::class);
-        $this->expectExceptionMessage('Missing API Token');
+        $this->expectExceptionMessage('Missing App ID (NADI_APP_ID)');
 
         $transporter = new Http;
         $transporter->configure();
+    }
 
+    /**
+     * Test Http Transporter missing App Secret.
+     */
+    public function test_http_transporter_missing_app_secret(): void
+    {
         $this->expectException(TransporterException::class);
-        $this->expectExceptionMessage('Missing Application Token');
+        $this->expectExceptionMessage('Missing App Secret (NADI_APP_SECRET)');
 
+        $transporter = new Http;
         $transporter->configure([
-            'key' => 'unittest-key',
+            'app_id' => 'unittest-app-id',
         ]);
     }
 
@@ -84,8 +91,8 @@ class CoreTest extends TestCase
     {
         $headers = [
             'Accept' => 'application/vnd.nadi.'.Http::VERSION.'+json',
-            'Authorization' => 'Bearer unittest-key',
-            'Nadi-Token' => 'unittest-token',
+            'Nadi-App-Id' => 'unittest-app-id',
+            'Nadi-App-Secret' => 'unittest-app-secret',
             'Nadi-Transporter-Id' => '07f44616ac3c5812d914d8ea537b0df70abd69205cc278019547e27bddabf3e1',
             'Content-Type' => 'application/json',
         ];
@@ -104,8 +111,8 @@ class CoreTest extends TestCase
 
         $transporter = new Http;
         $transporter->configure([
-            'key' => 'unittest-key',
-            'token' => 'unittest-token',
+            'app_id' => 'unittest-app-id',
+            'app_secret' => 'unittest-app-secret',
         ]);
         $transporter->setClient($client);
 
@@ -231,8 +238,8 @@ class CoreTest extends TestCase
 
         $headers = [
             'Accept' => 'application/vnd.nadi.'.Http::VERSION.'+json',
-            'Authorization' => 'Bearer unittest-key',
-            'Nadi-Token' => 'unittest-token',
+            'Nadi-App-Id' => 'unittest-app-id',
+            'Nadi-App-Secret' => 'unittest-app-secret',
             'Nadi-Transporter-Id' => '07f44616ac3c5812d914d8ea537b0df70abd69205cc278019547e27bddabf3e1',
             'Content-Type' => 'application/json',
         ];
@@ -251,8 +258,8 @@ class CoreTest extends TestCase
 
         $transporter = new Http;
         $transporter->configure([
-            'key' => 'unittest-key',
-            'token' => 'unittest-token',
+            'app_id' => 'unittest-app-id',
+            'app_secret' => 'unittest-app-secret',
         ]);
         $transporter->setClient($client);
 

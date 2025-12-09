@@ -4,23 +4,23 @@ namespace Nadi\Exceptions;
 
 class TransporterException extends \Exception
 {
-    public static function throwIfMissingKey($key = null)
+    public static function throwIfMissingAppId($appId = null)
     {
-        if (empty($key)) {
-            throw new self('Missing API Token');
+        if (empty($appId)) {
+            throw new self('Missing App ID (NADI_APP_ID)');
         }
     }
 
-    public static function throwIfMissingApplicationToken($token = null)
+    public static function throwIfMissingAppSecret($appSecret = null)
     {
-        if (empty($token)) {
-            throw new self('Missing Application Token');
+        if (empty($appSecret)) {
+            throw new self('Missing App Secret (NADI_APP_SECRET)');
         }
     }
 
-    public static function throwIfMissingCredentials($key = null, $token = null)
+    public static function throwIfMissingAppCredentials($appId = null, $appSecret = null)
     {
-        self::throwIfMissingKey($key);
-        self::throwIfMissingApplicationToken($token);
+        self::throwIfMissingAppId($appId);
+        self::throwIfMissingAppSecret($appSecret);
     }
 }

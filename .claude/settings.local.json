@@ -11,7 +11,10 @@
       "Bash(xargs ls:*)",
       "Bash(wc:*)",
       "Bash(php -l:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(composer update:*)"
     ]
   }
 }

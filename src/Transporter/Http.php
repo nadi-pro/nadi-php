@@ -19,6 +19,8 @@ class Http implements Contract
 
     protected string $endpoint;
 
+    protected string $version;
+
     protected $configurations = [];
 
     protected $storage = [];
@@ -27,13 +29,13 @@ class Http implements Contract
     {
         $this->configurations = $configurations;
 
-        $version = $this->configurations['version'] ?? self::VERSION;
+        $this->version = $this->configurations['version'] ?? self::VERSION;
         $endpoint = $this->configurations['endpoint'] ?? self::ENDPOINT;
 
         $this->endpoint = $endpoint;
 
         // Determine authentication scheme based on provided credentials
-        $headers = $this->buildAuthHeaders($version);
+        $headers = $this->buildAuthHeaders();
 
         $this->setClient(
             new Client([
@@ -45,21 +47,27 @@ class Http implements Contract
     }
 
     /**
-     * Build authentication headers using App ID + App Secret.
+     * Build authentication headers.
+     *
+     * Authentication scheme (consistent with shipper):
+     * - Authorization: Bearer {apiKey} - Sanctum authentication
+     * - Nadi-App-Token: {token} - Application identifier
+     * - X-API-Version: v1 - API version
      */
-    protected function buildAuthHeaders(string $version): array
+    protected function buildAuthHeaders(): array
     {
-        $appId = $this->configurations['app_id'] ?? null;
-        $appSecret = $this->configurations['app_secret'] ?? null;
+        $apiKey = $this->configurations['apiKey'] ?? $this->configurations['api_key'] ?? null;
+        $token = $this->configurations['token'] ?? null;
 
-        TransporterException::throwIfMissingAppCredentials($appId, $appSecret);
+        TransporterException::throwIfMissingAppCredentials($apiKey, $token);
 
         return [
-            'Accept' => 'application/vnd.nadi.'.$version.'+json',
-            'Nadi-Transporter-Id' => $this->getTransporterId(),
+            'Accept' => 'application/json',
             'Content-Type' => 'application/json',
-            'Nadi-App-Id' => $appId,
-            'Nadi-App-Secret' => $appSecret,
+            'Authorization' => 'Bearer '.$apiKey,
+            'Nadi-App-Token' => $token,
+            'X-API-Version' => $this->version,
+            'Nadi-Transporter-Id' => $this->getTransporterId(),
         ];
     }
 

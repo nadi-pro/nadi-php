@@ -24,6 +24,7 @@ composer require nadi-pro/nadi-php
 - 🎯 **Smart Sampling**: Multiple sampling strategies including fixed-rate, interval-based, peak-load, and dynamic
 - 🚀 **Multiple Transporters**: HTTP API, Local Logging, and OpenTelemetry exporters
 - 🔄 **Trace Correlation**: Automatic trace context capture for distributed tracing
+- 📦 **Shipper Binary Manager**: Auto-download and manage the Nadi Shipper binary
 
 ## OpenTelemetry Support
 
@@ -342,7 +343,6 @@ if($samplingManager->shouldSample()) {
 To create your own sampling strategy:
 
 ```php
-
 namespace App\Sampling;
 
 use Nadi\Sampling\Contract;
@@ -358,5 +358,107 @@ class CustomSampling implements Contract
 
         return true;
     }
+}
+```
+
+## Shipper Binary Manager
+
+The SDK includes a shared library for managing the Nadi Shipper binary. This allows automatic downloading and installation of the shipper binary across different PHP packages (Laravel, WordPress, etc.).
+
+### Supported Platforms
+
+| Operating System | Architectures |
+|-----------------|---------------|
+| Linux | amd64, 386, arm64 |
+| macOS (Darwin) | amd64, arm64 |
+| Windows | amd64 |
+
+### Basic Usage
+
+```php
+use Nadi\Shipper\BinaryManager;
+
+// Create manager with target directory
+$manager = new BinaryManager('/path/to/bin');
+
+// Install latest version
+$binaryPath = $manager->install();
+
+// Check if installed
+if ($manager->isInstalled()) {
+    echo "Shipper installed at: " . $manager->getBinaryPath();
+    echo "Version: " . $manager->getInstalledVersion();
+}
+
+// Check for updates
+if ($manager->needsUpdate()) {
+    $newVersion = $manager->update();
+    echo "Updated to: " . $newVersion;
+}
+
+// Execute shipper
+$result = $manager->execute(['--config=/path/to/nadi.yaml', '--record']);
+echo $result['output'];
+
+// Uninstall
+$manager->uninstall();
+```
+
+### Components
+
+#### PlatformDetector
+
+Detects the current operating system and architecture:
+
+```php
+use Nadi\Shipper\PlatformDetector;
+
+$detector = new PlatformDetector();
+
+echo $detector->getOS();           // darwin, linux, windows
+echo $detector->getArch();         // amd64, 386, arm64
+echo $detector->getBinaryName('v1.0.0');  // shipper-v1.0.0-darwin-arm64.tar.gz
+
+if ($detector->isSupported()) {
+    // Platform is supported
+}
+```
+
+#### VersionResolver
+
+Resolves versions from GitHub releases:
+
+```php
+use Nadi\Shipper\VersionResolver;
+
+$resolver = new VersionResolver();
+
+$latestVersion = $resolver->getLatestVersion();  // e.g., "v1.0.0"
+$downloadUrl = $resolver->getReleaseUrl($latestVersion, 'shipper-v1.0.0-linux-amd64.tar.gz');
+$configContent = $resolver->downloadReferenceConfig();
+```
+
+### Exception Handling
+
+The library uses specific exceptions for different error scenarios:
+
+```php
+use Nadi\Shipper\BinaryManager;
+use Nadi\Shipper\Exceptions\ShipperException;
+use Nadi\Shipper\Exceptions\DownloadException;
+use Nadi\Shipper\Exceptions\ExtractionException;
+use Nadi\Shipper\Exceptions\UnsupportedPlatformException;
+
+try {
+    $manager = new BinaryManager('/path/to/bin');
+    $manager->install();
+} catch (UnsupportedPlatformException $e) {
+    // Platform not supported (e.g., Windows 386)
+} catch (DownloadException $e) {
+    // Network error or GitHub API issue
+} catch (ExtractionException $e) {
+    // Failed to extract the archive
+} catch (ShipperException $e) {
+    // General shipper error
 }
 ```

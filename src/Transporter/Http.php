@@ -52,7 +52,7 @@ class Http implements Contract
      * Authentication scheme (consistent with shipper):
      * - Authorization: Bearer {apiKey} - Sanctum authentication
      * - Nadi-App-Token: {token} - Application identifier
-     * - X-API-Version: v1 - API version
+     * - Nadi-API-Version: v1 - API version
      */
     protected function buildAuthHeaders(): array
     {
@@ -66,7 +66,7 @@ class Http implements Contract
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer '.$apiKey,
             'Nadi-App-Token' => $token,
-            'X-API-Version' => $this->version,
+            'Nadi-API-Version' => $this->version,
             'Nadi-Transporter-Id' => $this->getTransporterId(),
         ];
     }

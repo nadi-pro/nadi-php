@@ -11,6 +11,12 @@ class Browser extends Base
     public function metrics(): array
     {
         $request = function_exists('request') ? request() : null;
+
+        // Return empty array if no request (console context)
+        if (! $request) {
+            return [];
+        }
+
         $browser = (new Parser(null, $request))->detect()->toArray();
         foreach ($browser as $key => $value) {
             unset($browser[$key]);

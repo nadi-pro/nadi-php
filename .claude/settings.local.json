@@ -16,7 +16,8 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(composer update:*)",
       "Bash(tree:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(markdownlint:*)"
     ]
   }
 }

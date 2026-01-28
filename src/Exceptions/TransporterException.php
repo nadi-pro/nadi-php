@@ -11,16 +11,16 @@ class TransporterException extends \Exception
         }
     }
 
-    public static function throwIfMissingToken($token = null)
+    public static function throwIfMissingAppKey($appKey = null)
     {
-        if (empty($token)) {
-            throw new self('Missing Token (NADI_TOKEN). This is the application identifier token.');
+        if (empty($appKey)) {
+            throw new self('Missing App Key (NADI_APP_KEY). This is the application identifier token.');
         }
     }
 
-    public static function throwIfMissingAppCredentials($apiKey = null, $token = null)
+    public static function throwIfMissingAppCredentials($apiKey = null, $appKey = null)
     {
         self::throwIfMissingApiKey($apiKey);
-        self::throwIfMissingToken($token);
+        self::throwIfMissingAppKey($appKey);
     }
 }

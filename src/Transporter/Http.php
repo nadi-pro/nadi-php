@@ -50,22 +50,22 @@ class Http implements Contract
      * Build authentication headers.
      *
      * Authentication scheme (consistent with shipper):
-     * - Authorization: Bearer {apiKey} - Sanctum authentication
-     * - Nadi-App-Token: {token} - Application identifier
+     * - Authorization: Bearer {apiKey} - Sanctum authentication (NADI_API_KEY)
+     * - Nadi-App-Token: {appKey} - Application identifier (NADI_APP_KEY)
      * - Nadi-API-Version: v1 - API version
      */
     protected function buildAuthHeaders(): array
     {
         $apiKey = $this->configurations['apiKey'] ?? $this->configurations['api_key'] ?? null;
-        $token = $this->configurations['token'] ?? null;
+        $appKey = $this->configurations['appKey'] ?? $this->configurations['app_key'] ?? $this->configurations['token'] ?? null;
 
-        TransporterException::throwIfMissingAppCredentials($apiKey, $token);
+        TransporterException::throwIfMissingAppCredentials($apiKey, $appKey);
 
         return [
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer '.$apiKey,
-            'Nadi-App-Token' => $token,
+            'Nadi-App-Token' => $appKey,
             'Nadi-API-Version' => $this->version,
             'Nadi-Transporter-Id' => $this->getTransporterId(),
         ];

@@ -88,6 +88,13 @@ class Entry
     public $spanId;
 
     /**
+     * The runtime environment (php, javascript, python, etc.).
+     *
+     * @var string
+     */
+    public $runtime = 'php';
+
+    /**
      * Create a new incoming entry instance.
      *
      * @param  string|null  $uuid
@@ -167,6 +174,26 @@ class Entry
     public function getSpanId(): ?string
     {
         return $this->spanId;
+    }
+
+    /**
+     * Set the runtime for this entry
+     *
+     * @return $this
+     */
+    public function setRuntime(string $runtime): self
+    {
+        $this->runtime = $runtime;
+
+        return $this;
+    }
+
+    /**
+     * Get the runtime
+     */
+    public function getRuntime(): string
+    {
+        return $this->runtime;
     }
 
     /**
@@ -384,6 +411,7 @@ class Entry
             'title' => $this->getTitle(),
             'description' => $this->getDescription(),
             'hash_family' => $this->getHashFamily(),
+            'runtime' => $this->getRuntime(),
             'type' => $this->getType(),
             'content' => $this->getContent(),
             'meta' => $this->metric->toArray(),

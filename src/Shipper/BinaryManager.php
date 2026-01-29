@@ -147,6 +147,35 @@ class BinaryManager
     }
 
     /**
+     * Re-install the binary regardless of current version state.
+     *
+     * Unlike update(), this skips the needsUpdate() check and
+     * forcefully replaces the binary.
+     *
+     * @param  string|null  $version  Specific version to install, or null for latest
+     * @return string The installed version
+     *
+     * @throws ShipperException
+     */
+    public function reInstall(?string $version = null): string
+    {
+        $version = $version ?? $this->versionResolver->getLatestVersion();
+        $this->install($version);
+
+        return $version;
+    }
+
+    /**
+     * Get the latest available version from GitHub.
+     *
+     * @throws DownloadException
+     */
+    public function getLatestVersion(): string
+    {
+        return $this->versionResolver->getLatestVersion();
+    }
+
+    /**
      * Uninstall the shipper binary and version file.
      */
     public function uninstall(): void

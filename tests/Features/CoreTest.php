@@ -64,7 +64,7 @@ class CoreTest extends TestCase
     public function test_http_transporter_exceptions(): void
     {
         $this->expectException(TransporterException::class);
-        $this->expectExceptionMessage('Missing App ID (NADI_APP_ID)');
+        $this->expectExceptionMessage('Missing API Key (NADI_API_KEY)');
 
         $transporter = new Http;
         $transporter->configure();
@@ -73,14 +73,14 @@ class CoreTest extends TestCase
     /**
      * Test Http Transporter missing App Secret.
      */
-    public function test_http_transporter_missing_app_secret(): void
+    public function test_http_transporter_missing_app_key(): void
     {
         $this->expectException(TransporterException::class);
-        $this->expectExceptionMessage('Missing App Secret (NADI_APP_SECRET)');
+        $this->expectExceptionMessage('Missing App Key (NADI_APP_KEY)');
 
         $transporter = new Http;
         $transporter->configure([
-            'app_id' => 'unittest-app-id',
+            'api_key' => 'unittest-api-key',
         ]);
     }
 
@@ -111,8 +111,8 @@ class CoreTest extends TestCase
 
         $transporter = new Http;
         $transporter->configure([
-            'app_id' => 'unittest-app-id',
-            'app_secret' => 'unittest-app-secret',
+            'api_key' => 'unittest-api-key',
+            'app_key' => 'unittest-app-key',
         ]);
         $transporter->setClient($client);
 
@@ -258,8 +258,8 @@ class CoreTest extends TestCase
 
         $transporter = new Http;
         $transporter->configure([
-            'app_id' => 'unittest-app-id',
-            'app_secret' => 'unittest-app-secret',
+            'api_key' => 'unittest-api-key',
+            'app_key' => 'unittest-app-key',
         ]);
         $transporter->setClient($client);
 

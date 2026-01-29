@@ -23,7 +23,7 @@ Implementing custom sampling strategies.
 
 ### [4. Transporters](04-transporters.md)
 
-Configuring and using HTTP, Log, and OpenTelemetry transporters.
+Configuring and using HTTP, Log, TCP, and OpenTelemetry transporters.
 
 ### [5. OpenTelemetry](05-opentelemetry.md)
 

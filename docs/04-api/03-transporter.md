@@ -103,6 +103,48 @@ class OpenTelemetry implements Contract
 | `service_name`    | string | Service identifier |
 | `service_version` | string | Service version    |
 
+## Tcp Transporter
+
+Send entries over a persistent TCP socket using NDJSON framing.
+
+```php
+namespace Nadi\Transporter;
+
+class Tcp implements Contract
+{
+    const PORT = 7430;
+
+    public function configure(array $options): self;
+    public function store(array $data): self;
+    public function send();
+    public function test();
+    public function verify();
+    public function setSocket($socket): self;
+    public function disconnect(): void;
+}
+```
+
+**Configuration Options:**
+
+| Option       | Type   | Default | Description                          |
+|--------------|--------|---------|--------------------------------------|
+| `host`       | string | —       | TCP server hostname/IP (required)    |
+| `port`       | int    | `7430`  | TCP server port                      |
+| `timeout`    | int    | `30`    | Connection/write timeout in seconds  |
+| `persistent` | bool   | `true`  | Use persistent socket connections    |
+
+**Return Values:**
+
+| Method     | Success | Failure | Notes                            |
+|------------|---------|---------|----------------------------------|
+| `send()`   | `true`  | `true`  | Never breaks the monitored app   |
+| `test()`   | `true`  | `false` | Diagnostic — truthful reporting  |
+| `verify()` | `true`  | `false` | Diagnostic — truthful reporting  |
+
+**Testing Support:**
+
+Use `setSocket($socket)` to inject a mock stream resource for unit testing without a real TCP server.
+
 ## SilentTransportWrapper
 
 Suppress exceptions during transport.
@@ -131,6 +173,9 @@ class TransporterException extends \Exception
     public static function throwIfMissingApiKey($apiKey = null): void;
     public static function throwIfMissingAppKey($appKey = null): void;
     public static function throwIfMissingAppCredentials($apiKey, $appKey): void;
+    public static function throwIfMissingHost($host = null): void;
+    public static function throwIfMissingPort($port = null): void;
+    public static function throwIfMissingTcpCredentials($host, $port): void;
 }
 ```
 

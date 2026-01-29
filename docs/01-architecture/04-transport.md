@@ -80,6 +80,42 @@ $transporter->configure([
 - Datadog
 - New Relic
 
+## TCP Transporter
+
+The `Tcp` transporter sends data over a persistent TCP socket using
+newline-delimited JSON (NDJSON) framing. It uses only PHP built-in
+`stream_socket_client()` with no additional dependencies.
+
+```php
+use Nadi\Transporter\Tcp;
+
+$transporter = new Tcp();
+$transporter->configure([
+    'host' => '127.0.0.1',
+    'port' => 7430,          // Default: 7430
+    'timeout' => 30,          // Default: 30 seconds
+    'persistent' => true,     // Default: true
+]);
+```
+
+**Design decisions:**
+
+- **Lazy connection**: Socket opens on first `send()`/`test()`/`verify()`, not in `configure()`
+- **Persistent sockets**: Uses `STREAM_CLIENT_PERSISTENT` for long-running processes
+- **NDJSON framing**: Each entry is serialized as `json_encode($entry) . "\n"`
+- **Partial write handling**: Internal loop handles TCP partial writes
+- **Single reconnect**: On write failure, disconnects and reconnects once before retrying
+- **Graceful error handling**: `send()` returns `true` even on failure to never break the monitored app.
+  `test()`/`verify()` return `false` on failure for truthful diagnostics
+- **Fail-fast configuration**: `configure()` throws `TransporterException` if host or port is missing
+
+**Compatible receivers:**
+
+- Logstash (TCP input plugin)
+- Fluentd (in_tcp plugin)
+- Vector (tcp source)
+- Custom TCP daemons
+
 ## SilentTransportWrapper
 
 Wraps transporters to suppress exceptions:
@@ -112,6 +148,9 @@ Available methods:
 - `throwIfMissingApiKey($apiKey)`
 - `throwIfMissingAppKey($appKey)`
 - `throwIfMissingAppCredentials($apiKey, $appKey)`
+- `throwIfMissingHost($host)`
+- `throwIfMissingPort($port)`
+- `throwIfMissingTcpCredentials($host, $port)`
 
 ## Next Steps
 

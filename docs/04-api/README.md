@@ -18,7 +18,7 @@ Sampling strategy classes, `Config`, and `SamplingManager`.
 
 ### [3. Transporter](03-transporter.md)
 
-Transporter classes for HTTP, Log, and OpenTelemetry delivery.
+Transporter classes for HTTP, Log, TCP, and OpenTelemetry delivery.
 
 ### [4. Data](04-data.md)
 

@@ -88,6 +88,72 @@ $transporter->send();
 
 See [OpenTelemetry Guide](05-opentelemetry.md) for detailed integration.
 
+## TCP Transporter
+
+Send data over a persistent TCP socket using NDJSON framing. Compatible with Logstash, Fluentd,
+Vector, and custom TCP daemons. No additional dependencies required.
+
+```php
+use Nadi\Transporter\Tcp;
+use Nadi\Data\Entry;
+use Nadi\Data\Type;
+
+$transporter = new Tcp();
+$transporter->configure([
+    'host' => '127.0.0.1',
+    'port' => 7430,
+]);
+
+$entry = Entry::make(Type::EXCEPTION, [
+    'class' => 'RuntimeException',
+    'message' => 'An error occurred',
+]);
+
+$transporter->store($entry->toArray());
+$transporter->send();
+```
+
+### Configuration Options
+
+| Option       | Type   | Default | Description                            |
+|--------------|--------|---------|----------------------------------------|
+| `host`       | string | —       | TCP server hostname or IP (required)   |
+| `port`       | int    | `7430`  | TCP server port                        |
+| `timeout`    | int    | `30`    | Connection/write timeout in seconds    |
+| `persistent` | bool   | `true`  | Keep socket open across `send()` calls |
+
+### Error Handling
+
+The TCP transporter is designed to never break your application:
+
+- `send()` always returns `true`, even if the TCP server is unreachable
+- `test()` and `verify()` return `false` on connection failure
+- `configure()` throws `TransporterException` if `host` is missing
+
+### Testing the Connection
+
+```php
+$transporter = new Tcp();
+$transporter->configure([
+    'host' => '127.0.0.1',
+    'port' => 7430,
+]);
+
+if ($transporter->test()) {
+    echo 'TCP connection successful';
+} else {
+    echo 'TCP connection failed';
+}
+```
+
+### Cleanup
+
+The socket is automatically closed when the transporter is destroyed. To close it manually:
+
+```php
+$transporter->disconnect();
+```
+
 ## Silent Transport Wrapper
 
 Suppress exceptions during transport:

@@ -26,7 +26,7 @@ Sampling strategies, configuration, and custom strategy implementation.
 
 ### [4. Transport](04-transport.md)
 
-Transport layer design, HTTP, Log, and OpenTelemetry transporters.
+Transport layer design, HTTP, Log, TCP, and OpenTelemetry transporters.
 
 ## Related Documentation
 

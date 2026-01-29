@@ -23,4 +23,24 @@ class TransporterException extends \Exception
         self::throwIfMissingApiKey($apiKey);
         self::throwIfMissingAppKey($appKey);
     }
+
+    public static function throwIfMissingHost($host = null)
+    {
+        if (empty($host)) {
+            throw new self('Missing TCP host. A hostname or IP address is required.');
+        }
+    }
+
+    public static function throwIfMissingPort($port = null)
+    {
+        if (empty($port)) {
+            throw new self('Missing TCP port. A port number is required.');
+        }
+    }
+
+    public static function throwIfMissingTcpCredentials($host = null, $port = null)
+    {
+        self::throwIfMissingHost($host);
+        self::throwIfMissingPort($port);
+    }
 }

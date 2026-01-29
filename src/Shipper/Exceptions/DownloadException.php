@@ -2,6 +2,4 @@
 
 namespace Nadi\Shipper\Exceptions;
 
-class DownloadException extends ShipperException
-{
-}
+class DownloadException extends ShipperException {}

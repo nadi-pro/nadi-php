@@ -2,6 +2,4 @@
 
 namespace Nadi\Shipper\Exceptions;
 
-class ShipperException extends \Exception
-{
-}
+class ShipperException extends \Exception {}

@@ -17,7 +17,8 @@
       "Bash(composer update:*)",
       "Bash(tree:*)",
       "Bash(ls:*)",
-      "Bash(markdownlint:*)"
+      "Bash(markdownlint:*)",
+      "Bash(composer format:*)"
     ]
   }
 }

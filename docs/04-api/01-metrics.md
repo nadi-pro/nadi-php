@@ -53,10 +53,10 @@ class Metric
     /**
      * Add a custom metric.
      */
-    public function add(Contract $metric): self;
+    public function add(Contract $metric): void;
 
     /**
-     * Get all aggregated metrics.
+     * Get all aggregated metrics (includes built-in + custom).
      */
     public function toArray(): array;
 }

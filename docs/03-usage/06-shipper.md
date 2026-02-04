@@ -30,9 +30,20 @@ if ($manager->needsUpdate()) {
     echo "Updated to: " . $newVersion;
 }
 
+// Force reinstall regardless of version state
+$version = $manager->reInstall();
+// Or reinstall a specific version
+$version = $manager->reInstall('v1.2.0');
+
 // Uninstall
 $manager->uninstall();
 ```
+
+| Method        | Description                                           |
+|---------------|-------------------------------------------------------|
+| `update()`    | Updates only if a newer version is available           |
+| `reInstall()` | Forces a fresh install, skipping the version check     |
+| `uninstall()` | Removes the binary and version file                    |
 
 ## Executing the Shipper
 

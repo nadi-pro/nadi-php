@@ -1,10 +1,17 @@
-<p align="center">
-<a href="https://github.com/nadi-pro/nadi-php/actions"><img src="https://github.com/nadi-pro/nadi-php/actions/workflows/run-tests.yml/badge.svg" alt="Build Status"></a>
-</p>
-
 # Nadi PHP Client
 
-Nadi is a simple issue tracker for monitoring your application crashes. This package developed for PHP with built-in OpenTelemetry support for industry-standard observability.
+[![Latest Version](https://img.shields.io/github/v/release/nadi-pro/nadi-php?style=flat-square)](https://github.com/nadi-pro/nadi-php/releases) [![License](https://img.shields.io/github/license/nadi-pro/nadi-php?style=flat-square)](LICENSE) [![CI](https://img.shields.io/github/actions/workflow/status/nadi-pro/nadi-php/run-tests.yml?style=flat-square)](https://github.com/nadi-pro/nadi-php/actions) [![Packagist Version](https://img.shields.io/packagist/v/nadi-pro/nadi-php?style=flat-square)](https://packagist.org/packages/nadi-pro/nadi-php) [![Packagist Downloads](https://img.shields.io/packagist/dt/nadi-pro/nadi-php?style=flat-square)](https://packagist.org/packages/nadi-pro/nadi-php) [![PHP Version](https://img.shields.io/packagist/dependency-v/nadi-pro/nadi-php/php?style=flat-square)](https://packagist.org/packages/nadi-pro/nadi-php)
+
+A PHP SDK for application crash/error monitoring with built-in OpenTelemetry support for industry-standard observability.
+
+## Documentation
+
+Full documentation is available in the [docs/](docs/README.md) directory:
+
+- [Architecture](docs/01-architecture/README.md) - System design and patterns
+- [Development](docs/02-development/README.md) - Developer guides and testing
+- [Usage](docs/03-usage/README.md) - Practical integration guides
+- [API Reference](docs/04-api/README.md) - Class and interface documentation
 
 ## Requirements
 
@@ -28,7 +35,9 @@ composer require nadi-pro/nadi-php
 
 ## OpenTelemetry Support
 
-Nadi PHP SDK now includes first-class support for OpenTelemetry (OTel), enabling seamless integration with modern observability platforms like Jaeger, Prometheus, Grafana, Datadog, and New Relic.
+Nadi PHP SDK now includes first-class support for OpenTelemetry (OTel), enabling seamless
+integration with modern observability platforms like Jaeger, Prometheus, Grafana, Datadog,
+and New Relic.
 
 ### OpenTelemetry Transporter
 
@@ -193,7 +202,9 @@ Run the test suite:
 composer test
 ```
 
-**Note:** OpenTelemetry tests may show connection warnings if Jaeger is not running locally. These are expected and the tests will still pass. To run tests with a live OTLP endpoint, start Jaeger first:
+**Note:** OpenTelemetry tests may show connection warnings if Jaeger is not running locally.
+These are expected and the tests will still pass. To run tests with a live OTLP endpoint,
+start Jaeger first:
 
 ```bash
 # Start Jaeger for testing
@@ -212,7 +223,9 @@ You can add a new metric as you see fit to your application / framework.
 
 Do take note, all metrics will be converted to associative array.
 
-In order to create your own metrics, you need to extends the class `Nadi\Metric\Base` and implement your metrics details in `metrics()` method which always return an array. You may need to define as a dot notation in your metric.
+In order to create your own metrics, you need to extend the class `Nadi\Metric\Base` and implement
+your metrics details in `metrics()` method which always returns an array. You may need to define
+as a dot notation in your metric.
 
 However, Nadi will convert to the associative array.
 
@@ -279,9 +292,7 @@ If you are adding from Laravel framework, you can simply just add in `config/nad
 
 ## Class Diagram
 
-<center>
-<img src="nadi-php-uml-diagram.png">
-</center>
+![Nadi PHP UML Class Diagram](nadi-php-uml-diagram.png)
 
 ## Sampling
 
@@ -363,7 +374,9 @@ class CustomSampling implements Contract
 
 ## Shipper Binary Manager
 
-The SDK includes a shared library for managing the Nadi Shipper binary. This allows automatic downloading and installation of the shipper binary across different PHP packages (Laravel, WordPress, etc.).
+The SDK includes a shared library for managing the Nadi Shipper binary. This allows automatic
+downloading and installation of the shipper binary across different PHP packages (Laravel,
+WordPress, etc.).
 
 ### Supported Platforms
 

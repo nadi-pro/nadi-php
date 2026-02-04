@@ -154,25 +154,31 @@ The socket is automatically closed when the transporter is destroyed. To close i
 $transporter->disconnect();
 ```
 
-## Silent Transport Wrapper
+## Using the Service Class
 
-Suppress exceptions during transport:
+The `Service` class combines a transporter with a sampling manager to control data flow:
 
 ```php
-use Nadi\Transporter\SilentTransportWrapper;
 use Nadi\Transporter\Http;
+use Nadi\Transporter\Service;
+use Nadi\Sampling\FixedRateSampling;
+use Nadi\Sampling\SamplingManager;
+use Nadi\Sampling\Config;
 
-$http = new Http();
-$http->configure([...]);
+$transporter = (new Http())->configure([
+    'apiKey' => env('NADI_API_KEY'),
+    'appKey' => env('NADI_APP_KEY'),
+]);
 
-$transporter = new SilentTransportWrapper($http);
+$config = new Config(samplingRate: 0.5);
+$sampling = new SamplingManager(new FixedRateSampling($config));
 
-// Exceptions are caught and logged, not thrown
-$transporter->store($entry->toArray());
-$transporter->send();
+$service = new Service($transporter, $sampling);
+
+// Data is only stored if sampling allows it
+$service->handle($entry->toArray());
+$service->send();
 ```
-
-Useful for production environments where transport failures should not affect the application.
 
 ## Batching Entries
 

@@ -16,6 +16,8 @@ $transporter->configure([
     'endpoint' => 'http://localhost:4318',
     'service_name' => 'my-php-app',
     'service_version' => '1.0.0',
+    'deployment_environment' => 'staging',  // default: 'production'
+    'suppress_errors' => true,              // default: true
 ]);
 
 $entry = Entry::make(Type::EXCEPTION, [
@@ -28,6 +30,17 @@ $entry = Entry::make(Type::EXCEPTION, [
 $transporter->store($entry->toArray());
 $transporter->send();
 ```
+
+### Configuration Options
+
+| Option                   | Type            | Default                | Description                  |
+|--------------------------|-----------------|------------------------|------------------------------|
+| `endpoint`               | string          | `http://localhost:4318`| OTLP endpoint URL            |
+| `service_name`           | string          | `nadi-php`             | Service identifier           |
+| `service_version`        | string          | `1.0.0`                | Service version              |
+| `suppress_errors`        | bool            | `true`                 | Suppress OTLP export errors  |
+| `logger`                 | LoggerInterface | `NullLogger`           | PSR-3 logger for diagnostics |
+| `deployment_environment` | string          | `production`           | Deployment environment label |
 
 ## Trace Context Correlation
 

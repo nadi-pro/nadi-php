@@ -4,22 +4,50 @@ The transport layer handles delivery of telemetry data to various backends using
 
 ## Design Pattern
 
-All transporters implement the `Contract` interface with three lifecycle methods:
+All transporters implement the `Contract` interface:
 
 ```php
 interface Contract
 {
-    public function configure(array $options): self;
+    public function configure(array $configurations = []): self;
+    public function getTransporterId(): string;
     public function store(array $data): self;
-    public function send(): void;
+    public function send();
+    public function test();
+    public function verify();
 }
 ```
 
-**Lifecycle:**
+### Lifecycle Methods
+
+The core data flow follows three steps:
 
 1. `configure()` - Set up credentials and options
 2. `store()` - Add entries to the batch
 3. `send()` - Deliver batched entries to the backend
+
+### Diagnostic Methods
+
+Two additional methods exist for connection validation:
+
+| Method     | Purpose                                          |
+|------------|--------------------------------------------------|
+| `test()`   | Tests connectivity to the backend                |
+| `verify()` | Verifies configuration and credentials are valid |
+
+These are not part of the core data flow and are used for health checks and setup validation.
+
+## Service Orchestration
+
+The `Service` class combines a transporter with a `SamplingManager` to control whether data is stored:
+
+```php
+$service = new Service($transporter, $samplingManager);
+$service->handle($data); // stores only if sampling allows
+$service->send();
+```
+
+This decouples sampling logic from transport logic.
 
 ## HTTP Transporter
 
@@ -30,7 +58,6 @@ use Nadi\Transporter\Http;
 
 $transporter = new Http();
 $transporter->configure([
-    'endpoint' => 'https://api.nadi.pro/api/entries',
     'apiKey' => 'your-api-key',      // NADI_API_KEY - Bearer token
     'appKey' => 'your-app-key',      // NADI_APP_KEY - Application identifier
 ]);
@@ -40,11 +67,12 @@ $transporter->configure([
 
 - `Authorization: Bearer {apiKey}` - Sanctum authentication
 - `Nadi-App-Token: {appKey}` - Application identifier
-- `Nadi-Transporter-Id: {hash}` - Consistent transporter ID
+- `Nadi-API-Version: {version}` - API version
+- `Nadi-Transporter-Id: {hash}` - Transporter instance ID
 
 ## Log Transporter
 
-The `Log` transporter writes entries to local files:
+The `Log` transporter writes entries to local JSON files:
 
 ```php
 use Nadi\Transporter\Log;
@@ -59,7 +87,7 @@ Useful for development, debugging, or offline collection.
 
 ## OpenTelemetry Transporter
 
-The `OpenTelemetry` transporter exports data using OTLP:
+The `OpenTelemetry` transporter exports data as OTLP spans:
 
 ```php
 use Nadi\Transporter\OpenTelemetry;
@@ -71,6 +99,9 @@ $transporter->configure([
     'service_version' => '1.0.0',
 ]);
 ```
+
+Uses `SilentTransportWrapper` internally to suppress stderr output from the OTel SDK
+when `suppress_errors` is enabled (the default).
 
 **Compatible backends:**
 
@@ -118,19 +149,17 @@ $transporter->configure([
 
 ## SilentTransportWrapper
 
-Wraps transporters to suppress exceptions:
+An internal component used by the `OpenTelemetry` transporter to suppress stderr output during OTLP exports.
 
-```php
-use Nadi\Transporter\SilentTransportWrapper;
-
-$wrapped = new SilentTransportWrapper($transporter);
-// Exceptions are caught and logged, not thrown
-```
+> **Note**: This class implements `OpenTelemetry\SDK\Common\Export\TransportInterface`,
+> not `Nadi\Transporter\Contract`. It wraps OTel transports specifically, not generic
+> Nadi transporters.
 
 ## Transporter ID
 
-The `InteractsWithTransporterId` trait generates a consistent SHA256 hash for each transporter
-instance, used for tracking and deduplication.
+The `InteractsWithTransporterId` trait generates a unique 64-character hash for each transporter
+instance, used for tracking and deduplication. The value is generated once and cached for the
+lifetime of the instance.
 
 ## Exception Handling
 

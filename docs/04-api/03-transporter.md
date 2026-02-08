@@ -140,7 +140,7 @@ class Http implements Contract
 | `endpoint` | string | `https://nadi.pro/api`   | API endpoint URL                      |
 | `version`  | string | `v1`                     | API version                           |
 
-Alternative keys: `api_key` for `apiKey`, `app_key` or `token` for `appKey`.
+Alternative keys: `api_key` for `apiKey`, `app_key` or `token` (deprecated) for `appKey`.
 
 **Headers Sent:**
 

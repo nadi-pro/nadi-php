@@ -46,8 +46,8 @@ The HTTP transporter accepts multiple key formats:
 // Snake case
 ['api_key' => '...', 'app_key' => '...']
 
-// Legacy
-['token' => '...']  // For appKey
+// Legacy (deprecated)
+['token' => '...']  // For appKey (backward compat only)
 ```
 
 ## Log Transporter

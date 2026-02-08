@@ -28,7 +28,7 @@ All sampling classes implement `Contract->shouldSample(): bool`. The `SamplingMa
 
 ### Transport Layer
 
-Transporters implement `Contract` with lifecycle methods: `configure()` → `store()` → `send()`. HTTP transporter requires `key` and `token` credentials, uses Guzzle with custom headers including transporter ID.
+Transporters implement `Contract` with lifecycle methods: `configure()` → `store()` → `send()`. HTTP transporter requires `apiKey` and `appKey` credentials, uses Guzzle with custom headers including transporter ID.
 
 ## Development Workflows
 
@@ -65,7 +65,7 @@ composer format         # Run Laravel Pint code formatting
 
 Use static factory methods on exception classes:
 ```php
-TransporterException::throwIfMissingCredentials($key, $token);
+TransporterException::throwIfMissingAppCredentials($apiKey, $appKey);
 ```
 
 ### Data Flow Pattern

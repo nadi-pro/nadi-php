@@ -13,7 +13,7 @@ use Nadi\Data\Type;
 
 $transporter = new Http();
 $transporter->configure([
-    'endpoint' => 'https://api.nadi.pro/api/entries',
+    'endpoint' => 'https://nadi.pro/api',
     'apiKey' => env('NADI_API_KEY'),
     'appKey' => env('NADI_APP_KEY'),
 ]);

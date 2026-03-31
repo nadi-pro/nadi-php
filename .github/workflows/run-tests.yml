@@ -2,57 +2,28 @@ name: run-tests
 
 on:
   push:
-    branches: [master, 1.0]
-  pull_request:
-    branches: [master, 1.0]
+    paths:
+      - '**.php'
+      - '.github/workflows/run-tests.yml'
+      - 'phpunit.xml'
+      - 'composer.json'
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     strategy:
       fail-fast: true
       matrix:
-        php: [8.3, 8.2, 8.1]
-        laravel: [11.*, 10.*, 9.*]
+        php: [8.4, 8.3]
+        laravel: [12.*]
         stability: [prefer-stable]
-        include:
-          - php: 8.3
-            laravel: 11.*
-            ramsey: ^4.7
-            phpunit: ^10.1
-          - php: 8.3
-            laravel: 10.*
-            ramsey: ^4.7
-            phpunit: ^10.1
-          - php: 8.2
-            laravel: 10.*
-            ramsey: ^4.7
-            phpunit: ^10.1
-          - php: 8.3
-            laravel: 9.*
-            ramsey: ^4.7
-            phpunit: ^9.0
-          - php: 8.2
-            laravel: 9.*
-            ramsey: ^4.7
-            phpunit: ^9.0
-          - php: 8.1
-            laravel: 9.*
-            ramsey: ^4.7
-            phpunit: ^9.0
-        exclude:
-          - php: 8.2
-            laravel: 11.*
-          - php: 8.1
-            laravel: 11.*
-          - php: 8.1
-            laravel: 10.*
 
-    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - ${{ matrix.stability }}
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -63,8 +34,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "illuminate/support:${{ matrix.laravel }}" "ramsey/uuid:${{ matrix.ramsey }}" --no-interaction --no-update
-          composer require "phpunit/phpunit:${{ matrix.phpunit }}" --no-interaction --no-update --dev
+          composer require "illuminate/support:${{ matrix.laravel }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: List Installed Dependencies

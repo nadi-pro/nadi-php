@@ -96,11 +96,14 @@ class PeakLoadSampling extends BaseSampling
         $cores = 1;
 
         if (is_file('/proc/cpuinfo')) {
-            $cores = (int) shell_exec('nproc');
+            $result = @shell_exec('nproc');
+            $cores = $result !== null ? (int) $result : 1;
         } elseif ($this->isWindows()) {
-            $cores = (int) shell_exec('echo %NUMBER_OF_PROCESSORS%');
+            $result = @shell_exec('echo %NUMBER_OF_PROCESSORS%');
+            $cores = $result !== null ? (int) $result : 1;
         } elseif (stripos(PHP_OS, 'darwin') === 0 || stripos(PHP_OS, 'bsd') !== false) {
-            $cores = (int) shell_exec('sysctl -n hw.ncpu');
+            $result = @shell_exec('sysctl -n hw.ncpu');
+            $cores = $result !== null ? (int) $result : 1;
         }
 
         return max($cores, 1);

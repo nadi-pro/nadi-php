@@ -7,6 +7,7 @@ on:
       - '.github/workflows/run-tests.yml'
       - 'phpunit.xml'
       - 'composer.json'
+      - 'phpstan.neon.dist'
 
 jobs:
   test:
@@ -39,6 +40,12 @@ jobs:
 
       - name: List Installed Dependencies
         run: composer show -D
+
+      - name: Audit dependencies for known vulnerabilities
+        run: composer audit
+
+      - name: Run static analysis
+        run: vendor/bin/phpstan analyse --no-progress
 
       - name: Execute tests
         run: vendor/bin/phpunit

@@ -12,14 +12,6 @@ trait InteractsWithTransporterId
             return $this->transporter_id;
         }
 
-        $result = '';
-        $module_length = 40;
-        $steps = round((64 / $module_length) + 0.5);
-
-        for ($i = 0; $i < $steps; $i++) {
-            $result .= sha1(uniqid().md5(rand()));
-        }
-
-        return $this->transporter_id = substr($result, 0, 64);
+        return $this->transporter_id = bin2hex(random_bytes(32));
     }
 }

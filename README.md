@@ -51,7 +51,7 @@ use Nadi\Data\Type;
 // Configure OpenTelemetry transporter
 $transporter = new OpenTelemetry();
 $transporter->configure([
-    'endpoint' => 'http://localhost:4318',  // OTLP endpoint
+    'endpoint' => 'http://localhost:4318',  // Use https:// in production
     'service_name' => 'my-php-app',
     'service_version' => '1.0.0',
 ]);
@@ -168,7 +168,7 @@ $data = $entry->toArray();
 
 ```php
 $transporter->configure([
-    'endpoint' => 'http://jaeger:4318',
+    'endpoint' => 'http://jaeger:4318',  // Use https:// in production
     'service_name' => 'my-app',
 ]);
 ```
@@ -177,7 +177,7 @@ $transporter->configure([
 
 ```php
 $transporter->configure([
-    'endpoint' => 'http://tempo:4318',
+    'endpoint' => 'http://tempo:4318',  // Use https:// in production
     'service_name' => 'my-app',
 ]);
 ```
@@ -216,6 +216,22 @@ composer test
 # Stop Jaeger
 docker stop jaeger && docker rm jaeger
 ```
+
+## Security & Data Privacy
+
+> **Important:** Nadi captures and transmits application error data including
+> exception messages, stack traces, SQL queries, HTTP request details, and
+> custom content you pass to `Entry::make()`. This data may contain
+> Personally Identifiable Information (PII).
+
+**As the SDK consumer, you are responsible for:**
+
+- Sanitizing or redacting PII from `Entry` content before calling `store()`
+- Filtering sensitive HTTP headers (e.g., `Authorization`, `Cookie`) from metric/entry data
+- Ensuring compliance with your organization's data handling policies (GDPR, HIPAA, SOC2, etc.)
+- Using HTTPS endpoints for all transporters in production environments
+
+See [SECURITY.md](SECURITY.md) for vulnerability reporting and security considerations.
 
 ## Adding New Metric
 

@@ -42,6 +42,8 @@ $transporter->send();
 | `logger`                 | LoggerInterface | `NullLogger`           | PSR-3 logger for diagnostics |
 | `deployment_environment` | string          | `production`           | Deployment environment label |
 
+> **Production Security:** Always use HTTPS (`https://`) endpoints in production environments. Telemetry data transmitted over unencrypted HTTP may expose sensitive application data including exception details, trace context, and system metrics. The `http://` examples in this document are intended for local development only.
+
 ## Trace Context Correlation
 
 Entries automatically capture active OpenTelemetry span context:
